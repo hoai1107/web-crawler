@@ -4,28 +4,21 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.print.Doc;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Set;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FCCCrawler extends WebCrawler {
     // FCC = FreeCodeCamp
     private final String FCC_BASE_URL = "https://www.freecodecamp.org";
-    private static final Set<String> linkSet = ConcurrentHashMap.newKeySet();
-    private static final LinkedBlockingQueue<Pair<String, Integer>> queue = new LinkedBlockingQueue<>();
     private final AtomicInteger counter = new AtomicInteger();
 
     FCCCrawler() {
-        super();
+        super(0);
     }
 
     public void crawl(String URL, int currentDepth) {
         try {
-            if (!linkSet.contains(URL) && currentDepth < MAX_DEPTH && counter.get() <= MAX_CRAWL) {
-                linkSet.add(URL);
+            if (currentDepth < MAX_DEPTH && counter.get() <= MAX_CRAWL) {
                 counter.getAndIncrement();
 
                 Document document = Jsoup.connect(URL).get();
@@ -43,7 +36,8 @@ public class FCCCrawler extends WebCrawler {
                     if (!nextURL.startsWith(FCC_BASE_URL)) {
                         return;
                     }
-                    queue.offer(Pair.of(nextURL, currentDepth + 1));
+
+                    addURLToCrawl(nextURL, currentDepth + 1);
                 }
             }
         } catch (IOException e) {
@@ -59,16 +53,16 @@ public class FCCCrawler extends WebCrawler {
 
             for (Element post : posts) {
                 String link = post.attr("abs:href");
-                queue.add(Pair.of(link, 0));
+                addURLToCrawl(link, 0);
             }
 
             while (counter.intValue() < MAX_CRAWL) {
-                Pair<String, Integer> item = queue.poll(5, TimeUnit.SECONDS);
+                Pair<String, Integer> item = getURLToCrawl();
                 if (item != null) {
                     workers.execute(() -> crawl(item.getKey(), item.getValue()));
                 }
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

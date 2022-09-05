@@ -6,22 +6,19 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MediumCrawler extends WebCrawler {
     private final String MEDIUM_BASE_URL = "https://medium.com/";
-    private final String[] TAGS = {"technology", "programming", "software-development", "java"};
-    private static AtomicInteger counter;
+    private final String[] TAGS = { "technology", "programming", "software-development", "java" };
 
+    private final static AtomicInteger counter = new AtomicInteger();
     private static final Set<String> linkSet = ConcurrentHashMap.newKeySet();
 
     public MediumCrawler() {
-        super();
-        counter = new AtomicInteger();
+        super(2);
     }
 
     public void crawl(String URL) {
@@ -45,8 +42,6 @@ public class MediumCrawler extends WebCrawler {
                         String link = el.attr("abs:href");
 
                         System.out.printf("Medium(%s) - %s (%s)\n", StringUtils.capitalize(category), title, link);
-
-                        Thread.sleep(Duration.ofSeconds(2).toMillis());
                     } else {
                         break;
                     }
@@ -54,8 +49,6 @@ public class MediumCrawler extends WebCrawler {
             }
         } catch (IOException e) {
             System.err.println("Error: " + URL + " - " + e.getMessage());
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 
