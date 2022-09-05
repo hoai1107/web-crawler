@@ -5,7 +5,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +23,7 @@ public class MediumCrawler extends WebCrawler {
     public void crawl(String URL) {
         String category = URL.substring(23);
         try {
-            if (!linkSet.contains(URL) && counter.get() <= MAX_CRAWL) {
+            if (!linkSet.contains(URL) && counter.get() < MAX_CRAWL) {
                 linkSet.add(URL);
 
                 Document document = Jsoup.connect(URL).get();

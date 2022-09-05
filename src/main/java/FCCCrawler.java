@@ -18,7 +18,7 @@ public class FCCCrawler extends WebCrawler {
 
     public void crawl(String URL, int currentDepth) {
         try {
-            if (currentDepth < MAX_DEPTH && counter.get() <= MAX_CRAWL) {
+            if (currentDepth < MAX_DEPTH && counter.get() < MAX_CRAWL) {
                 counter.getAndIncrement();
 
                 Document document = Jsoup.connect(URL).get();

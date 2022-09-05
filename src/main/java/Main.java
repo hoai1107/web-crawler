@@ -16,10 +16,6 @@ public class Main {
         crawlers.add(new MediumCrawler());
         crawlers.add(new LogRocketCrawler());
 
-        // for (WebCrawler crawler : crawlers) {
-        // executor.execute(crawler);
-        // }
-
         CompletableFuture<?>[] futures = crawlers.stream()
                 .map(crawler -> CompletableFuture.runAsync(crawler, executor))
                 .toArray(CompletableFuture[]::new);
